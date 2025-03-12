@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE project PUBLIC "-//Apache Software Foundation//DTD Ant 1.9//EN"
+    "http://ant.apache.org/ant-1.9.0.dtd">
+<project name="EmployeeManagement" default="build" basedir=".">
+    <!-- Dinh nghia cac thuoc tinh (properties) -->
+    <property name="src.dir" value="E:\baicode\BaiTapNhom3\Employee\src\EmployeeManagement"/>
+    <property name="build.dir" value="build"/>
+    <property name="dist.dir" value="dist"/>
+    <property name="test.dir" value="E:\baicode\BaiTapNhom3\Employee\test\EmployeeManagement"/> <!-- Thu muc chua cac lop kiem thu -->
+    <property name="build.test.dir" value="build/test"/> <!-- Thu muc chua cac lop byte code kiem thu -->
+    <property name="lib.dir" value="E:\baicode\BaiTapNhom3\Employee\lib"/> <!-- Thu muc chua cac thu vien JUnit 5 -->
+
+    <!-- Dinh nghia classpath cho JUnit 5 -->
+    <path id="classpath">
+        <pathelement location="${build.dir}"/>
+        <pathelement location="${build.test.dir}"/>
+        <pathelement location="${lib.dir}/junit-jupiter-api-5.10.2.jar"/>
+        <pathelement location="${lib.dir}/junit-jupiter-engine-5.10.2.jar"/>
+        <pathelement location="${lib.dir}/opentest4j-1.2.0.jar"/> <!-- Neu co -->
+        <pathelement path="${java.class.path}"/>
+    </path>
+
+    <!-- Target clean: Xoa cac thu muc build, dist, va build.test neu da ton tai -->
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+        <delete dir="${dist.dir}"/>
+        <delete dir="${build.test.dir}"/>
+    </target>
+
+    <!-- Target init: Tao cac thu muc build, dist, va build.test, phu thuoc vao target clean -->
+    <target name="init" depends="clean">
+        <mkdir dir="${build.dir}"/>
+        <mkdir dir="${dist.dir}"/>
+        <mkdir dir="${build.test.dir}"/>
+    </target>
+
+    <!-- Target compile: Bien dich ma nguon tu src.dir sang build.dir -->
+    <target name="compile" depends="init">
+        <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false">
+            <classpath refid="classpath"/>
+        </javac>
+    </target>
+
+    <!-- Target compile-test: Bien dich cac lop kiem thu tu test.dir sang build.test.dir -->
+    <target name="compile-test" depends="compile">
+        <javac srcdir="${test.dir}" destdir="${build.test.dir}" includeantruntime="false">
+            <classpath refid="classpath"/>
+        </javac>
+    </target>
+
+    <!-- Target test: Chay cac bai kiem thu JUnit 5, phu thuoc vao compile-test -->
+    <target name="test" depends="compile-test">
+        <junit fork="yes" haltonfailure="yes">
+            <classpath refid="classpath"/>
+            <formatter type="plain" usefile="false"/>
+            <batchtest>
+                <fileset dir="${build.test.dir}">
+                    <include name="**/*Test.class"/>
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+
+    <!-- Target build: Tao file JAR tu cac file da bien dich, phu thuoc vao compile -->
+    <target name="build" depends="compile">
+        <jar destfile="${dist.dir}/EmployeeManagement.jar" basedir="${build.dir}">
+            <manifest>
+                <attribute name="Main-Class" value="EmployeeManagement.EmployeeManagement"/> <!-- Sua lai ten lop chinh -->
+            </manifest>
+        </jar>
+    </target>
+</project>
